@@ -148,8 +148,6 @@ export class Veform {
                 }
                 this.peerConnection?.addTrack(track, this.localStream);
             });
-            const offer = await this.peerConnection.createOffer();
-            await this.peerConnection.setLocalDescription(offer);
 
             this.peerConnection.oniceconnectionstatechange = () => {
                 if (this.peerConnection?.iceConnectionState === 'connected') {
@@ -189,12 +187,25 @@ export class Veform {
                 } else {
                     this.resolveWsMessage(message);
                 }
-                // go pee than get this to have a convo inside of testjshtlm
-                // then we can update this to hook into all the events coming form the server
-                // then we can build out the UX, this will eventually be our like demo test page
             }
             
-            this.wsConnection.onopen = () => {
+            this.wsConnection.onopen = async() => {
+                if (!this.peerConnection) {
+                    console.error('Peer connection not established');
+                    return;
+                }
+                const offer = await this.peerConnection.createOffer();
+                await this.peerConnection.setLocalDescription(offer);
+                this.peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                      this.wsConnection?.send(
+                        JSON.stringify({
+                          type: "ice-candidate",
+                          payload: event.candidate,
+                        }),
+                      );
+                    }
+                };
                 this.wsConnection?.send(JSON.stringify({
                     type: "offer",
                     payload: this.peerConnection?.localDescription,
@@ -203,17 +214,10 @@ export class Veform {
                     type: "form",
                     payload: this.form,
                 }));
+
+                
             };
-            this.peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                  this.wsConnection?.send(
-                    JSON.stringify({
-                      type: "ice-candidate",
-                      payload: event.candidate,
-                    }),
-                  );
-                }
-            };
+  
             return true;
         } catch (error) {
             console.error('Error starting conversation:', error);

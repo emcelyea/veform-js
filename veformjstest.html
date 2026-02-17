@@ -1,82 +1,458 @@
-<html>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veform Playground</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        .focused {
-            border: 4px solid lightblue;
+        :root {
+            --primary-light: #6FAE8D;
+            --primary: #5A9B7A;
+            --primary-dark: #4A8567;
+            --secondary-dark: #66527D;
+            --secondary: #8F7BA3;
+            --accent: #E89B6E;
+            --accent-dark: #C76A3A;
+            --dark: #3D3426;
+            --dark-light: #5A4F3F;
+            --gray: #8B7E6B;
+            --light: #E8DCC8;
+            --white: #3D3426;
+            --bg-main: #E8DCC8;
+            --bg-alt: #F5EFE3;
+        }
+    
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        body {
+            font-family: "Nunito Sans", -apple-system, BlinkMacSystemFont,
+                "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+            background: var(--bg-main);
+            color: var(--white);
+        }
+    
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+    
+        header {
+            background: rgba(232, 220, 200, 0.95);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(61, 52, 38, 0.2);
+            box-shadow: 0 2px 10px rgba(61, 52, 38, 0.1);
+        }
+    
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+    
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--dark);
+        }
+    
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+    
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+    
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+    
+        .welcome-message {
+            margin-top: 80px;
+            margin-left: 16px;
+        }
+        .main-content {
+            display: flex;
+            flex: 1;
+            margin-top: 40px
+        }
+    
+        .editors {
+            display: flex;
+            flex-direction: column;
+            width: 48%;
+            margin-right: 1%;
+            background: var(--bg-main);
+            margin-bottom: 12px;
+            min-height: 420px;
+        }
+    
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        .editor-tabs {
+            display: flex;
+        }
+    
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            background: #2d2d30;
+            color: var(--white);
+            border: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+            background: var(--bg-main);
+        }
+    
+        .tab:hover {
+            border-bottom-color: var(--primary);
+            background: var(--bg-alt);
+    
+        }
+    
+        .tab.active {
+            border-bottom-color: var(--primary);
+            background: var(--bg-alt);
+        }
+    
+        .run-button {
+            background: var(--primary-dark);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            border: none;
+            height: 32px;
+        }
+    
+        .run-button:hover {
+            background: var(--primary);
+        }
+    
+        .run-button:active {
+            transform: scale(0.98);
+        }
+    
+        .editor-container {
+            flex: 1;
+            display: none;
+            position: relative;
+        }
+    
+        .editor-container.active {
+            display: block;
+            overflow: scroll;
+        }
+    
+    
+        .CodeMirror {
+            height: 100% !important;
+            font-size: 14px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+    
+        .preview {
+            flex: 1;
+            background: white;
+            position: relative;
+            margin-bottom: 12px;
+            min-height: 420px;
+        }
+    
+        .preview-header {
+            background: var(--bg-main);
+            padding: 10px 4px;
+            color: var(--white);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+    
+        #preview-frame {
+            width: 100%;
+            height: calc(100% - 45px);
+            border: none;
+            background: white;
+        }
+    
+        @media (max-width: 920px) {
+            .main-content {
+                flex-direction: column;
+            }
+    
+            .editors {
+                width: 100%;
+                height: 50%;
+                border-right: none;
+            }
+            .tab {
+                padding: 12px 16px;
+            }
+            .welcome-message {
+                text-align: center;
+                margin-left: 0;
+            }
+            .run-button {
+                margin-right: 4px;
+            }
         }
     </style>
 </head>
-<body>  
-    <p id="loading" style="display: none;">Loading...</p>
+<body>
+    <div class="container">
+        <header>
+            <nav>
+                <div class="logo">Veform</div>
+                <ul class="nav-links">
+                    <li><a href="#features">What</a></li>
+                    <li><a href="#integration">Docs</a></li>
+                </ul>
+            </nav>
+        </header>
+    
+        <div class="welcome-message">
+            <h3>Veform Playground</h3>
+            <p>Edit the HTML & JavaScript to test different form configurations.
+                <br/>A basic example is already setup, but you can edit it to perform more complex setups.</p>
+                <p>View the <a href="https://github.com/veform/veform-js">Documentation</a> to learn about all the things you can do.</p>
+        </div>
+        <div class="main-content">
+    
+            <div class="editors">
+                <div class="editor-header">
+                    <div class="editor-tabs">
+                        <button class="tab active" onclick="switchTab('html')">HTML</button>
+                        <button class="tab" onclick="switchTab('css')">CSS</button>
+                        <button class="tab" onclick="switchTab('js')">JavaScript</button>
+                    </div>
+                    <button class="run-button" onclick="runCode()">▶ Run Code</button>
+                </div>
+    
+                <div id="html-editor" class="editor-container active">
+                    <textarea id="html-code"></textarea>
+                </div>
+    
+                <div id="css-editor" class="editor-container">
+                    <textarea id="css-code"></textarea>
+                </div>
+    
+                <div id="js-editor" class="editor-container">
+                    <textarea id="js-code"></textarea>
+                </div>
+            </div>
+    
+            <div class="preview">
+                <div class="preview-header">Preview</div>
+                <iframe id="preview-frame"></iframe>
+            </div>
+        </div>
+    
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+
+    <script>
+        // Initialize CodeMirror editors
+        const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-code'), {
+            mode: 'htmlmixed',
+            lineNumbers: true,
+            autoCloseTags: true,
+            autoCloseBrackets: true,
+            indentUnit: 2,
+            tabSize: 2,
+            lineWrapping: true,
+        });
+
+        const cssEditor = CodeMirror.fromTextArea(document.getElementById('css-code'), {
+            mode: 'css',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            indentUnit: 2,
+            tabSize: 2,
+            lineWrapping: true
+        });
+
+        const jsEditor = CodeMirror.fromTextArea(document.getElementById('js-code'), {
+            mode: 'javascript',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            indentUnit: 2,
+            tabSize: 2,
+            lineWrapping: true
+        });
+
+        // Set default content
+        htmlEditor.setValue(`<div class="container">
+    <button id="start" class="start">Start conversation</button>
     <label for="name">Name</label>
-    <input type="text" id="name" />
+    <input id="name" type="text"/>
     <label for="age">Age</label>
-    <input type="number" id="age" />
-    <button id="start">Start</button>
+    <input id="age" type="number"/>
+    <script src="dist/veform.browser.js"></sc`+`ript>
+</div>`);
+
+        cssEditor.setValue(`.container {
+  display:flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  background: #ccc;
+  border: 1px solid black;
+  padding: 8px 12px;
+  margin: 24px 12px;
+  position:relative;
+}
+
+.start {
+	position: absolute;
+  top: 8px;
+  right: 8px;
+  background: white;
+  border: none;
+  padding: 4px 12px;
+  cursor: pointer;
+}`);
+
+        jsEditor.setValue(`const builder = new Veform.VeformBuilder();
+builder.addField({name: 'name', question: 'What is your name?', type: 'textarea'});
+builder.addField({name: 'age', question: 'What is your age?', type: 'number'});
+
+const veform = new Veform.Veform(builder.getFields());
+veform.onFieldValueChanged((fieldName, value) => {
+  const element = document.getElementById(fieldName);
+  if (element) {
+     element.value = value;
+  }
+});
+
+document.getElementById('start').addEventListener('click', () => {
+  veform.start();
+});`);
+
+        // Tab switching
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update editor containers
+            document.querySelectorAll('.editor-container').forEach(e => e.classList.remove('active'));
+            document.getElementById(`${tab}-editor`).classList.add('active');
+
+            // Refresh the active editor
+            if (tab === 'html') htmlEditor.refresh();
+            if (tab === 'css') cssEditor.refresh();
+            if (tab === 'js') jsEditor.refresh();
+        }
+
+        function runCode() {
+            const html = htmlEditor.getValue();
+            const css = cssEditor.getValue();
+            const js = jsEditor.getValue();
+            const iframe = document.getElementById('preview-frame');
+            const content = "<!DOCTYPE html><html><head><style>" + css + "</style></head><body>" + html + "<script>" + js + "</scr" + "ipt></body></html>";
+            iframe.srcdoc = content;
+        }
+
+        // Auto-run on load
+        runCode();
+
+    </script>
 </body>
-<!-- Option 1: Use as a global (IIFE bundle) -->
-<script src="dist/veform.browser.js"></script>
-<script>
-    var builder = new Veform.VeformBuilder();
-    console.log('Builder', builder, typeof builder);
-    builder.addField({name: 'name', question: 'What is your name?', type: 'textarea'});
-    builder.addField({name: 'age', question: 'What is your age?', type: 'number'});
-    var veform = new Veform.Veform(builder.getFields());
-    veform.onLoadingStarted(() => {
-        document.getElementById('loading').style.display = 'block';
-    });
-    veform.onRunningStarted(() => {
-        document.getElementById('loading').style.display = 'none';
-    });
-    veform.onFinished(() => {
-        console.log('Running finished');
-    });
-    veform.onError((error) => {
-        console.log('Error', error);
-    });
-    veform.onCriticalError((error) => {
-        console.log('Critical error', error);
-    });
-    veform.onAudioInStart(() => {
-        console.log('Audio in started');
-    });
-    veform.onAudioInEnd((input) => {
-        console.log('Audio in ended', input);
-        return false;
-    });
-    veform.onAudioOutStart((chunk) => {
-        console.log('Audio out started', chunk);
-        return false;
-    });
-    veform.onAudioOutEnd(() => {
-        console.log('Audio out ended');
-    });
-    veform.onFieldValueChanged((fieldName, value) => {
-        const element = document.getElementById(fieldName);
-        if (element) {
-            element.value = value;
-        }
-    });
-    veform.onFocusChanged((previousName, nextName) => {
-        const previousElement = document.getElementById(previousName);
-        const nextElement = document.getElementById(nextName);
-        if (previousElement && nextElement) {
-            previousElement.classList.remove('focused');
-            nextElement.classList.add('focused');
-        }
-    });
-    document.getElementById('start').addEventListener('click', () => {
-        veform.start();
-    });
-</script>
-
-<!-- Option 2: Use as an ES module -->
-<!-- 
-<script type="module">
-    import { greet, version } from './dist/index.js';
-    console.log(greet("John"));
-    console.log("Version:", version);
-</script>
--->
-
 </html>
+<!--
+/**
+* <script src="dist/veform.browser.js"></script>
+<script>
+var builder = new Veform.VeformBuilder();
+console.log('Builder', builder, typeof builder);
+builder.addField({name: 'name', question: 'What is your name?', type: 'text'});
+builder.addField({name: 'age', question: 'What is your age?', type: 'number'});
+var veform = new Veform.Veform(builder.getFields());
+veform.onLoadingStarted(() => {
+document.getElementById('loading').style.display = 'block';
+});
+veform.onRunningStarted(() => {
+document.getElementById('loading').style.display = 'none';
+});
+veform.onFinished(() => {
+console.log('Running finished');
+});
+veform.onError((error) => {
+console.log('Error', error);
+});
+veform.onCriticalError((error) => {
+console.log('Critical error', error);
+});
+veform.onAudioInStart(() => {
+console.log('Audio in started');
+});
+veform.onAudioInEnd((input) => {
+console.log('Audio in ended', input);
+return false;
+});
+veform.onAudioOutStart((chunk) => {
+console.log('Audio out started', chunk);
+return false;
+});
+veform.onAudioOutEnd(() => {
+console.log('Audio out ended');
+});
+veform.onFieldValueChanged((fieldName, value) => {
+const element = document.getElementById(fieldName);
+if (element) {
+   element.value = value;
+}
+});
+veform.onFocusChanged((previousName, nextName) => {
+const previousElement = document.getElementById(previousName);
+const nextElement = document.getElementById(nextName);
+if (previousElement && nextElement) {
+   previousElement.classList.remove('focused');
+   nextElement.classList.add('focused');
+}
+});
+document.getElementById('start').addEventListener('click', () => {
+veform.start();
+});
+</script>
+*/ -->

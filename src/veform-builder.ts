@@ -38,7 +38,11 @@ export class VeformBuilder {
 
     addField({name, question, type, validation, behavior}: Field): boolean {
         if (this.getField(name)) {
-            console.log(`Field with name ${name} already exists`);
+            console.error(`Field with name ${name} already exists`);
+            return false;
+        }
+        if (type !== "textarea" && type !== "select" && type !== "yesNo" && type !== "number" && type !== "date" && type !== "info") {
+            console.error(`Field with name ${name} has invalid type ${type}`);
             return false;
         }
         const field: Field = {
