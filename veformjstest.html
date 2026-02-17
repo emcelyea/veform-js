@@ -1,0 +1,82 @@
+<html>
+<head>
+    <style>
+        .focused {
+            border: 4px solid lightblue;
+        }
+    </style>
+</head>
+<body>  
+    <p id="loading" style="display: none;">Loading...</p>
+    <label for="name">Name</label>
+    <input type="text" id="name" />
+    <label for="age">Age</label>
+    <input type="number" id="age" />
+    <button id="start">Start</button>
+</body>
+<!-- Option 1: Use as a global (IIFE bundle) -->
+<script src="dist/veform.browser.js"></script>
+<script>
+    var builder = new Veform.VeformBuilder();
+    console.log('Builder', builder, typeof builder);
+    builder.addField({name: 'name', question: 'What is your name?', type: 'textarea'});
+    builder.addField({name: 'age', question: 'What is your age?', type: 'number'});
+    var veform = new Veform.Veform(builder.getFields());
+    veform.onLoadingStarted(() => {
+        document.getElementById('loading').style.display = 'block';
+    });
+    veform.onRunningStarted(() => {
+        document.getElementById('loading').style.display = 'none';
+    });
+    veform.onFinished(() => {
+        console.log('Running finished');
+    });
+    veform.onError((error) => {
+        console.log('Error', error);
+    });
+    veform.onCriticalError((error) => {
+        console.log('Critical error', error);
+    });
+    veform.onAudioInStart(() => {
+        console.log('Audio in started');
+    });
+    veform.onAudioInEnd((input) => {
+        console.log('Audio in ended', input);
+        return false;
+    });
+    veform.onAudioOutStart((chunk) => {
+        console.log('Audio out started', chunk);
+        return false;
+    });
+    veform.onAudioOutEnd(() => {
+        console.log('Audio out ended');
+    });
+    veform.onFieldValueChanged((fieldName, value) => {
+        const element = document.getElementById(fieldName);
+        if (element) {
+            element.value = value;
+        }
+    });
+    veform.onFocusChanged((previousName, nextName) => {
+        const previousElement = document.getElementById(previousName);
+        const nextElement = document.getElementById(nextName);
+        if (previousElement && nextElement) {
+            previousElement.classList.remove('focused');
+            nextElement.classList.add('focused');
+        }
+    });
+    document.getElementById('start').addEventListener('click', () => {
+        veform.start();
+    });
+</script>
+
+<!-- Option 2: Use as an ES module -->
+<!-- 
+<script type="module">
+    import { greet, version } from './dist/index.js';
+    console.log(greet("John"));
+    console.log("Version:", version);
+</script>
+-->
+
+</html>
