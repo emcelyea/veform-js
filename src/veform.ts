@@ -272,6 +272,7 @@ export class Veform {
     }
 
     private resolveWsMessage(message: any) {
+        console.log('RAW WS MESSAGE:', message);
         switch (message.type) {
             case "event-start":
                 if (this.eventHandlers.onRunningStarted) {
@@ -317,9 +318,9 @@ export class Veform {
                     }
                 }
                 return;
-            case "event-field-resolved":
+            case "event-field-value-changed":
                 if (this.eventHandlers.onFieldValueChanged) {
-                    this.eventHandlers.onFieldValueChanged(message.payload.fieldName, message.payload.answer);
+                    this.eventHandlers.onFieldValueChanged(message.payload.fieldName, message.payload.value);
                 }
                 return;
             case "event-error":

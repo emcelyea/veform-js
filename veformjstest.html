@@ -358,6 +358,7 @@ builder.addField({name: 'age', question: 'What is your age?', type: 'number'});
 
 const veform = new Veform.Veform(builder.getFields());
 veform.onFieldValueChanged((fieldName, value) => {
+console.log('FieldValueChanged', fieldName, value);
   const element = document.getElementById(fieldName);
   if (element) {
      element.value = value;
