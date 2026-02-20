@@ -103,12 +103,7 @@ export class Veform {
     onAudioOutEnd(callback: EventHandlers['onAudioOutEnd']) {
         this.eventHandlers.onAudioOutEnd = callback;
     }
-    onFocusChanged(callback: EventHandlers['onFocusChanged']) {
-        this.eventHandlers.onFocusChanged = callback;
-    }
-    onFieldValueChanged(callback: EventHandlers['onFieldValueChanged']) {
-        this.eventHandlers.onFieldValueChanged = callback;
-    }
+
 
     /**
      * Start the conversation
