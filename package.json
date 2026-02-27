@@ -6,6 +6,11 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "homepage": "https://veform.co",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emcelyea/veform-js.git"
+  },
   "scripts": {
     "build": "tsc && node build.js",
     "prepare": "yarn build",
