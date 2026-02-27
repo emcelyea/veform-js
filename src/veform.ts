@@ -103,15 +103,21 @@ export class Veform {
     onAudioOutEnd(callback: EventHandlers['onAudioOutEnd']) {
         this.eventHandlers.onAudioOutEnd = callback;
     }
+    onFieldValueChanged(callback: EventHandlers['onFieldValueChanged']) {
+        this.eventHandlers.onFieldValueChanged = callback;
+    }
+    onFocusChanged(callback: EventHandlers['onFocusChanged']) {
+        this.eventHandlers.onFocusChanged = callback;
+    }
 
 
     /**
      * Start the conversation
      * This will connect the client the the veform server with the current set of fields
      */
-    async start() {
+    async start(token: string) {
         if (!this.form?.fields || this.form?.fields.length === 0) {
-            console.error('No fields provided');
+            console.error('No fields provided or token URL');
             return false;
         }
         if (this.connected || this.wsConnection || this.peerConnection || this.localStream) {
@@ -119,6 +125,14 @@ export class Veform {
             return false;
         }
         try {
+            if (token.startsWith('http')) {
+                console.log('Fetching token from URL', token);
+                token = await fetch(token, { method: 'POST' }).then(response => response.json()).then(data => data.token);
+            }
+            if (!token) {
+                console.error('No token provided or returned from token URL');
+                return false;
+            }
             this.audioElement = createAudioElement();
             if (this.eventHandlers.onLoadingStarted) {
                 this.eventHandlers.onLoadingStarted();
@@ -166,7 +180,7 @@ export class Veform {
                 this.audioElement.play().catch((e) => console.error("Play error:", e));
             };
             // create websocket connection
-            this.wsConnection = new WebSocket(DEFAULT_SERVER_URL);
+            this.wsConnection = new WebSocket(DEFAULT_SERVER_URL + '?token=' + token);
             this.wsConnection.onmessage = (event) => {
                 const message = JSON.parse(event.data);
                 if (!this.peerConnection) {
@@ -310,10 +324,21 @@ export class Veform {
                     const interrupt = this.eventHandlers.onFocusChanged(message.payload.previousName, message.payload.nextName);
                     if (interrupt) {
                         console.log('Focus changed interrupted');
+                        return;
                     }
+                }
+                const nextField  = this.form.fields.find((field) => field.name === message.payload.nextName);
+                if (nextField?.eventHandlers?.onFocus) {
+                    nextField.eventHandlers.onFocus(message.payload.previousName);
                 }
                 return;
             case "event-field-value-changed":
+                console.log('CHECKING FOR FIELD:', message.payload);
+                const field = this.form.fields.find((field) => field.name === message.payload.fieldName);
+                console.log('FIELD:', field);
+                if (field?.eventHandlers?.onChange) {
+                    field.eventHandlers.onChange(message.payload.value);
+                }
                 if (this.eventHandlers.onFieldValueChanged) {
                     this.eventHandlers.onFieldValueChanged(message.payload.fieldName, message.payload.value);
                 }

@@ -352,8 +352,13 @@
   cursor: pointer;
 }`);
 
-        jsEditor.setValue(`const builder = new Veform.VeformBuilder();
-const nameField = builder.addField({name: 'name', question: 'What is your name?', type: 'textarea'});
+        jsEditor.setValue(`
+        const builder = new Veform.VeformBuilder();
+const nameField = builder.addField({name: 'name', question: 'What is your name?', type: 'text'});
+nameField.addValidation({
+  validate: true,
+  pattern: "name"
+});
 nameField.onChange((value) => {
    const element = document.getElementById("name");
   if (element) {
@@ -365,59 +370,19 @@ nameField.onFocus((previous, next) => {
   if (nextElement) {
      nextElement.focus();
   }
-    if (previous == "age") {
-       veform.emitAudio("wow great age!", true);
-       veform.changeField('goodbye', true);
-       return true;
-    }
 });
-// nameField.addValidation({
-//   validate: true,
-//   pattern: "name"
-// });
-// nameField.addBehavior(FieldEvents.INVALID_ANSWER, {
-//   type: FieldBehaviorType.MOVE_TO,
-//   moveToFieldName: 'goodbye'
-// });
-// const hasAccidentField = builder.addField({
-//   name: 'hasAccident', 
-//   question: 'Have you had any accidents?',
-//   type: 'yesNo'
-// });
-// builder.addField({
-//   name: 'accidentDetails', 
-//   question: 'Can you describe what happened?',
-//   type: 'textarea'
-// });
-// builder.addField({
-// name:'gladYourSafe',
-// question: 'Glad you\'re safe!',
-// type: 'info'
-// });
-// hasAccidentField.addBehavior(FieldEvents.VALID_ANSWER, {
-//   type: FieldBehaviorType.VALID_YES_ANSWER,
-//   moveToFieldName: 'accidentDetails'
-// });
-// hasAccidentField.addBehavior(FieldEvents.VALID_NO_ANSWER, {
-//   type: FieldBehaviorType.MOVE_TO,
-//   moveToFieldName: 'gladYourSafe'
-// });
-// // OR PROGRAMMATICALLY
-// hasAccidentField.onChange((value) => {
-//   if (value === true) {
-//         veform.changeField('accidentDetails', true);
-//   } else {
-//     veform.changeField('gladYourSafe', true);
-//   }
-//     return true;
-// });
-builder.addField({name: 'age', question: 'What is your age?', type: 'number'});
+const age  = builder.addField({name: 'age', question: 'What is your age?', type: 'number'});
+age.onChange((value) => {
+  const element = document.getElementById("age");
+  if (element) {
+    element.value = value;
+  }
+});
 builder.addField({name: 'goodbye', question: 'Thanks for your time, Goodbye!', type: 'info'});
 
 const veform = new Veform.Veform(builder.getFields());
-
 document.getElementById('start').addEventListener('click', () => {
-  veform.start();
+  veform.start('https://demo.veform.co/veform-token');
 });`);
 
         // Tab switching

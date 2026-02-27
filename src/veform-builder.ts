@@ -12,8 +12,8 @@ enum FieldType {
 }
 
 type EventHandlers = {
-    onFocus?: (previousName: string, nextName: string) => boolean;
-    onChange?: (fieldName: string, answer: string | number | boolean) => void;
+    onFocus?: (previousName: string) => boolean;
+    onChange?: (answer: string | number | boolean) => void;
 }
 
 export abstract class Field {
@@ -22,7 +22,7 @@ export abstract class Field {
       public question: string,
       public type: FieldType,
       public eventConfig?: FieldEventConfig,
-      private eventHandlers: EventHandlers = {},
+      public eventHandlers: EventHandlers = {},
     ) {}
 
     addBehavior(event: FieldEvents, behavior: FieldBehavior): void {

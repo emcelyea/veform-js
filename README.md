@@ -1,9 +1,9 @@
 # veform-js
 
-A JavaScript/TypeScript library for Veform.
+JS/TS Library for [Veform](https://veform.co)
 
-## TODOS:
-test the rest of the ws event hooks
+
+For usage/examples see [Playground](https://veform.co/playground)
 
 ## License
 
