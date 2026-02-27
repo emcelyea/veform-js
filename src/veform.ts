@@ -1,6 +1,6 @@
 import { Field, VeformBuilder } from './veform-builder';
 
-const DEFAULT_SERVER_URL = 'ws://localhost:8080/ws';
+const DEFAULT_SERVER_URL = 'ws://api.veform.co/veform-api/ws';
 type EventHandlers = {
     /** 
     * Called immediately after start() is called 
@@ -281,7 +281,6 @@ export class Veform {
     }
 
     private resolveWsMessage(message: any) {
-        console.log('RAW WS MESSAGE:', message);
         switch (message.type) {
             case "event-start":
                 if (this.eventHandlers.onRunningStarted) {
