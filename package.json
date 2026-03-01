@@ -1,6 +1,6 @@
 {
   "name": "veform-js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Veform JavaScript/TypeScript library",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc && node build.js",
     "prepare": "yarn build",
-    "watch": "tsc --watch"
+    "watch": "node watch.js"
   },
   "keywords": [
     "veform"

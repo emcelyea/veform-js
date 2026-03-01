@@ -181,11 +181,11 @@ export class VeformBuilder {
 
     addField({name, question, type}: Field): Field | null {
         if (this.getField(name)) {
-            console.error(`Field with name ${name} already exists`);
+            this.log(`Field with name ${name} already exists`, 'error');
             return null;
         }
         if (name.length === 0 || question.length === 0) {
-            console.error(`Field with name ${name} and question ${question} has invalid name or question`);
+            this.log(`Field with name ${name} and question ${question} has invalid name or question`, 'error');
             return null;
         }
         let field: Field;
@@ -212,7 +212,7 @@ export class VeformBuilder {
                 field = new MultiselectField(name, question);
                 break;
             default:
-                console.error(`Field with name ${name} has invalid type ${type}`);
+                this.log(`Field with name ${name} has invalid type ${type}`, 'error');
                 return null;
         }
         this.fields.push(field);
@@ -231,6 +231,7 @@ export class VeformBuilder {
     setField(name: string, field: Field): boolean {
         const index = this.fields.findIndex(field => field.name === name);
         if (index !== -1) {
+            this.log(`Field with name ${name} already exists, replacing with this one`, 'warn');
             this.fields[index] = field;
             return true;
         }
@@ -244,6 +245,22 @@ export class VeformBuilder {
             return true;
         }
         return false;
+    }
+
+    private colors = {
+        error: '#ff6b6b',
+        warn:  '#ffd166',
+        debug: '#74b9ff',
+    }
+
+    private log(message: string, type: 'error' | 'warn' | 'debug') {
+        if (type) {
+            const color = this.colors[type];
+            if (type === 'debug') {
+                return;
+            }
+            console.log(`%cVeform Builder: ${message}`, `color:${color}`);
+        }
     }
 }
 

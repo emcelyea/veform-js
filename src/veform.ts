@@ -1,6 +1,6 @@
 import { Field, VeformBuilder } from './veform-builder';
 
-const DEFAULT_SERVER_URL = 'ws://api.veform.co/veform-api/ws';
+const DEFAULT_SERVER_URL = 'wss://api.veform.co/veform-api/ws';
 type EventHandlers = {
     /** 
     * Called immediately after start() is called 
@@ -59,7 +59,6 @@ type EventHandlers = {
 }
 
 
-// this is what exposes all the cancelable events to user
 export class Veform {
     private connected: boolean = false;
     private form: {fields: Field[]};
@@ -68,11 +67,17 @@ export class Veform {
     private peerConnection: RTCPeerConnection | null = null;
     private wsConnection: WebSocket | null = null;
     private audioElement: HTMLAudioElement | null = null;
+    public debug: boolean = false;
+    public verbose: boolean = false;
     constructor(fields: Field[] | VeformBuilder) {
+        let form: {fields: Field[]};
         if (fields instanceof VeformBuilder) {
             this.form = {fields: fields.getFields()};
-        } else {
+        } else if (Array.isArray(fields)) {
             this.form = {fields: fields};
+        } else {
+            this.log(`Invalid form fields provided`, 'error');
+            this.form = {fields: []};
         }
     }
 
@@ -117,26 +122,34 @@ export class Veform {
      */
     async start(token: string) {
         if (!this.form?.fields || this.form?.fields.length === 0) {
-            console.error('No fields provided or token URL');
+            this.log('No fields provided', 'error');
             return false;
         }
+
         if (this.connected || this.wsConnection || this.peerConnection || this.localStream) {
-            console.error('Start already called, try running stop() or creating a new instance');
+            this.log('start called while already running', 'error');
             return false;
+        }
+        if (this.eventHandlers.onLoadingStarted) {
+            this.eventHandlers.onLoadingStarted();
         }
         try {
             if (token.startsWith('http')) {
-                console.log('Fetching token from URL', token);
-                token = await fetch(token, { method: 'POST' }).then(response => response.json()).then(data => data.token);
+                this.log(`Fetching token from URL: ${token}`, 'debug');
+                token = await fetch(token, { method: 'POST' }).then(response => response.json()).then(data => data.token || data);
+                this.log(`Fetched token from URL: ${token}`, 'debug');
             }
             if (!token) {
-                console.error('No token provided or returned from token URL');
+                this.log('No token provided or returned from token URL', 'error');
+                if (this.eventHandlers.onCriticalError) {
+                    this.eventHandlers.onCriticalError('No token provided or returned from token URL');
+                } else if (this.eventHandlers.onError) {
+                    this.eventHandlers.onError('No token provided or returned from token URL');
+                }
                 return false;
             }
             this.audioElement = createAudioElement();
-            if (this.eventHandlers.onLoadingStarted) {
-                this.eventHandlers.onLoadingStarted();
-            }
+   
             // get local audio track
             this.localStream = await navigator.mediaDevices.getUserMedia({
                 audio: {
@@ -149,49 +162,62 @@ export class Veform {
             });
 
             // setup local peerconnection
-            this.peerConnection = new RTCPeerConnection();
+            this.peerConnection = new RTCPeerConnection({
+                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+            });
             this.localStream.getTracks().forEach((track) => {
-                if (!this.localStream || !this.peerConnection) {
-                    console.error('Local stream or peer connection not established');
+                if (!this.localStream) {
+                    this.log('Local stream failed to get user media', 'error');
+                    return;
+                }
+                if (!this.peerConnection) {
+                    this.log('Peer connection failed to create', 'error');
                     return;
                 }
                 this.peerConnection?.addTrack(track, this.localStream);
             });
 
             this.peerConnection.oniceconnectionstatechange = () => {
+                this.log(`ICE connection state changed to: ${this.peerConnection?.iceConnectionState}`, 'debug');
                 if (this.peerConnection?.iceConnectionState === 'connected') {
                     this.connected = true;
-                    console.log('Peer connection connected');
+                    this.log('Peer connection connected', 'debug');
                 } else if (this.peerConnection?.iceConnectionState === 'disconnected') {
-                    console.log('Peer connection disconnected');
+                    this.log('Peer connection disconnected', 'debug');
                 } else if (this.peerConnection?.iceConnectionState === 'failed') {
-                   if (this.eventHandlers.onError) {
+                   if (this.eventHandlers.onCriticalError) {
+                    this.eventHandlers.onCriticalError('Connection to server failed');
+                   } else if (this.eventHandlers.onError) {
                     this.eventHandlers.onError('Connection to server failed');
                    }
+                   this.log('Connection to server failed, stopping conversation', 'error');
+                   this.stop();
                 }
             };
             this.peerConnection.ontrack = (event) => {
                 if (!this.audioElement) {
-                    console.error('Audio element not found');
+                    this.log('Audio element not found', 'error');
                     return;
                 }
                 const stream = event.streams[0];
                 this.audioElement.srcObject = stream;
-                this.audioElement.play().catch((e) => console.error("Play error:", e));
+                this.audioElement.play().catch((e) => this.log(`Audio element play error: ${e}`, 'error'));
             };
-            // create websocket connection
+
             this.wsConnection = new WebSocket(DEFAULT_SERVER_URL + '?token=' + token);
             this.wsConnection.onmessage = (event) => {
                 const message = JSON.parse(event.data);
                 if (!this.peerConnection) {
-                    console.error('WS response, Peer connection not established');
+                    this.log('WS response, Peer connection not established', 'error');
                     return;
                 }
                 if (message.type === "answer") {
                   const answer = new RTCSessionDescription(message.payload);
+                  this.log(`RTC: Received answer from server`, 'debug');
                   this.peerConnection.setRemoteDescription(answer);
                 } else if (message.type === "ice-candidate") {
                   const candidate = new RTCIceCandidate(message.payload);
+                  this.log(`RTC: Received candidate from server`, 'debug');
                   this.peerConnection.addIceCandidate(candidate);
                 } else {
                     this.resolveWsMessage(message);
@@ -200,13 +226,13 @@ export class Veform {
             
             this.wsConnection.onopen = async() => {
                 if (!this.peerConnection) {
-                    console.error('Peer connection not established');
+                    this.log('WS response, Peer connection not established', 'error');
                     return;
                 }
                 const offer = await this.peerConnection.createOffer();
-                await this.peerConnection.setLocalDescription(offer);
                 this.peerConnection.onicecandidate = (event) => {
                     if (event.candidate) {
+                      this.log(`RTC: Sending candidate to server`, 'debug');
                       this.wsConnection?.send(
                         JSON.stringify({
                           type: "ice-candidate",
@@ -215,21 +241,27 @@ export class Veform {
                       );
                     }
                 };
+                await this.peerConnection.setLocalDescription(offer);
+                this.log(`RTC: Sending offer to server`, 'debug');
                 this.wsConnection?.send(JSON.stringify({
                     type: "offer",
                     payload: this.peerConnection?.localDescription,
                 }));
+                this.log(`RTC: Sending form to server`, 'debug');
                 this.wsConnection?.send(JSON.stringify({
                     type: "form",
                     payload: this.form,
                 }));
-
-                
             };
   
             return true;
         } catch (error) {
-            console.error('Error starting conversation:', error);
+            this.log(`Error starting conversation: ${error}`, 'error');
+            if (this.eventHandlers.onCriticalError) {
+                this.eventHandlers.onCriticalError(`Error starting conversation: ${error}`);
+            } else if (this.eventHandlers.onError) {
+                this.eventHandlers.onError(`Error starting conversation: ${error}`);
+            }
             this.connected = false;
             this.wsConnection = null;
             this.peerConnection = null;
@@ -241,11 +273,7 @@ export class Veform {
      * Stop the conversation, this will cut off audio mid output
      */
     stop() {
-        console.log('Stop called');
-        if (!this.connected) {
-            console.error('Not connected to veform server');
-            return;
-        }
+        this.log('Stop called', 'debug');
         this.connected = false;
         this.wsConnection?.close();
         this.wsConnection = null;
@@ -262,25 +290,40 @@ export class Veform {
      * interrupt: if true, will interrupt the current output, otherwise will be queued behind current audio
      */
     emitAudio(audio: string, interrupt: boolean = false) {
-        console.log('Emit audio called', audio);
+        this.log(`Emit audio called: ${audio}`, 'debug');
+
+        if (!this.connected) {
+            this.log('EmitAudio called before connection was established', 'error');
+            return;
+        }
     }
 
     /**
      * Change the current field
-     * This will change the current field to the one provided
+     * This will change the current field to the one provided, the question for that field will be emitted.
+     * We recommend leading this with `emitAudio('we have to go back to ____', true), to interrupt current output, and provide some context to user
      */
-    changeField(fieldName: string, interrupt: boolean = false) {
-        console.log('Change field called', fieldName, interrupt);
+    changeField(fieldName: string) {
+        this.log(`Change field called: ${fieldName}`, 'debug');
+        if (!this.connected) {
+            this.log('Change field called before connection was established', 'error');
+            return;
+        }
     }
 
     /**
      * Stop current audio output
      */
     interrupt() {
-        console.log('Interrupt called');
+        this.log('Interrupt called', 'debug');
+        if (!this.connected) {
+            this.log('Interrupt called before connection was established', 'error');
+            return;
+        }
     }
 
     private resolveWsMessage(message: any) {
+        this.log(`WS message received: ${message.type}, ${this.verbose ? `Payload: ${JSON.stringify(message.payload)}` : ''}`, 'debug');
         switch (message.type) {
             case "event-start":
                 if (this.eventHandlers.onRunningStarted) {
@@ -296,7 +339,7 @@ export class Veform {
                 if (this.eventHandlers.onAudioOutStart) {
                     const interrupt = this.eventHandlers.onAudioOutStart(message.payload);
                     if (interrupt) {
-                        console.log('Audio out start interrupted');
+                        this.log('Audio out start interrupted', 'debug');
                     }
                 }
                 return;
@@ -322,7 +365,7 @@ export class Veform {
                 if (this.eventHandlers.onFocusChanged) {
                     const interrupt = this.eventHandlers.onFocusChanged(message.payload.previousName, message.payload.nextName);
                     if (interrupt) {
-                        console.log('Focus changed interrupted');
+                        this.log('Focus changed interrupted', 'debug');
                         return;
                     }
                 }
@@ -332,9 +375,7 @@ export class Veform {
                 }
                 return;
             case "event-field-value-changed":
-                console.log('CHECKING FOR FIELD:', message.payload);
                 const field = this.form.fields.find((field) => field.name === message.payload.fieldName);
-                console.log('FIELD:', field);
                 if (field?.eventHandlers?.onChange) {
                     field.eventHandlers.onChange(message.payload.value);
                 }
@@ -354,8 +395,24 @@ export class Veform {
                 }
                 return;
             default:
-                console.error('Unknown event type:', message.type);
+                this.log(`Unknown event type: ${message.type}`, 'error');
                 break;
+        }
+    }
+    
+    private colors = {
+        error: '#ff6b6b',
+        warn:  '#ffd166',
+        debug: '#74b9ff',
+    }
+
+    private log(message: string, type: 'error' | 'warn' | 'debug') {
+        if (type) {
+            const color = this.colors[type];
+            if (type === 'debug' && !this.debug && !this.verbose) {
+                return;
+            }
+            console.log(`%cVeform: ${message}`, `color:${color}`);
         }
     }
 }
