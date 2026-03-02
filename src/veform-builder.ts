@@ -1,7 +1,4 @@
-// TMRW MOVE THESE ALL TO CLASSES THAT CAN CONVERT TO THE JSON PAYLOAD WHEN NEEDED
-// then test we can actuall parse this nonsense in GO
-
-enum FieldType {
+export enum FieldType {
     TEXT = "text",
     TEXTAREA = "textarea",
     SELECT = "select",
@@ -25,7 +22,7 @@ export abstract class Field {
       public eventHandlers: EventHandlers = {},
     ) {}
 
-    addBehavior(event: FieldEvents, behavior: FieldBehavior): void {
+    addBehavior(event: FieldEvents, behavior: FieldBehavior): Field {
         if (!this.eventConfig) {
             this.eventConfig = {};
         }
@@ -42,19 +39,22 @@ export abstract class Field {
         } else {
             this.eventConfig[event].push(behavior);
         }
+        return this
     }
-    onFocus(callback: EventHandlers['onFocus']) {
+    onFocus(callback: EventHandlers['onFocus']): Field {
         this.eventHandlers.onFocus = callback;
+        return this
     }
-    onChange(callback: EventHandlers['onChange']) {
+    onChange(callback: EventHandlers['onChange']): Field {
         this.eventHandlers.onChange = callback;
+        return this
     }
 }
 
 export type FieldEventConfig = {
     [key in FieldEvents]?: FieldBehavior[];
 }
-enum FieldEvents {
+export enum FieldEvents {
     VALID_ANSWER = "validAnswer",
     INVALID_ANSWER = "invalidAnswer",
     MOVE_REQUESTED = "moveRequested",
@@ -62,9 +62,10 @@ enum FieldEvents {
     VALID_YES_ANSWER = "validYesAnswer",
     VALID_NO_ANSWER = "validNoAnswer",
 }
-enum FieldBehaviorType {
+export enum FieldBehaviorType {
     MOVE_TO = "moveTo",
     OUTPUT = "output",
+    END = "end",
 }
 type FieldBehavior = {
 	type: FieldBehaviorType;
@@ -78,8 +79,9 @@ export class TextField extends Field {
     constructor(name: string, question: string, eventConfig?: FieldEventConfig) {
         super(name, question, FieldType.TEXT, eventConfig);
     }
-    addValidation(validation: TextFieldValidation): void {
+    addValidation(validation: TextFieldValidation): Field {
         this.textFieldValidation = validation;
+        return this
     }
 }
 type TextFieldPatterns = 'email' | 'phone' | 'url' | 'date' | 'name';
@@ -113,17 +115,25 @@ export class SelectField extends Field {
             selectOptions: [],
         };
     }
-    addSelectOption(option: SelectOption): void {
+    addSelectOption({label, value, readAloud}: {label: string, value: string, readAloud?: boolean}): SelectOption {
+        const option = new SelectOption(label, value, readAloud);
         this.selectFieldValidation?.selectOptions?.push(option);
+        return option;
     }
 }
-export type SelectOption = {
-    label: string;
-    value: string;
-    readAloud?: boolean;
-    behaviors?: FieldBehavior[];
-}
+export class SelectOption {
+    public behaviors: FieldBehavior[] = [];
+    constructor(
+        public label: string,
+        public value: string,
+        public readAloud?: boolean,
+    ) {}
 
+    addBehavior(behavior: FieldBehavior): SelectOption {
+        this.behaviors.push(behavior);
+        return this;
+    }
+}
 type SelectFieldValidation = {
     validate: boolean;
     selectOptions?: SelectOption[];
@@ -133,9 +143,15 @@ export class MultiselectField extends Field {
     public multiselectFieldValidation?: SelectFieldValidation;
     constructor(name: string, question: string, eventConfig?: FieldEventConfig) {
         super(name, question, FieldType.MULTISELECT, eventConfig);
+        this.multiselectFieldValidation = {
+            validate: true,
+            selectOptions: [],
+        };
     }
-    addSelectOption(option: SelectOption): void {
+    addSelectOption({label, value, readAloud}: {label: string, value: string, readAloud?: boolean}): SelectOption {
+        const option = new SelectOption(label, value, readAloud);
         this.multiselectFieldValidation?.selectOptions?.push(option);
+        return option;
     }
 }
 
