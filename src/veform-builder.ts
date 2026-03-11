@@ -115,10 +115,13 @@ export class SelectField extends Field {
             selectOptions: [],
         };
     }
-    addSelectOption({label, value, readAloud}: {label: string, value: string, readAloud?: boolean}): SelectOption {
-        const option = new SelectOption(label, value, readAloud);
+    addSelectOption({label, value, readAloud, behaviors}: {label: string, value: string, readAloud?: boolean, behaviors?: FieldBehavior[]}): Field {
+        const option = new SelectOption(label, value, readAloud, behaviors);
         this.selectFieldValidation?.selectOptions?.push(option);
-        return option;
+        return this;
+    }
+    getSelectOption(value: string): SelectOption | undefined {
+        return this.selectFieldValidation?.selectOptions?.find(option => option.value === value);
     }
 }
 export class SelectOption {
@@ -127,7 +130,12 @@ export class SelectOption {
         public label: string,
         public value: string,
         public readAloud?: boolean,
-    ) {}
+        behaviors?: FieldBehavior[],
+    ) {
+        if (behaviors) {
+            this.behaviors = behaviors;
+        }
+    }
 
     addBehavior(behavior: FieldBehavior): SelectOption {
         this.behaviors.push(behavior);
@@ -139,8 +147,19 @@ type SelectFieldValidation = {
     selectOptions?: SelectOption[];
 }
 
+type MultiselectOption = {
+    label: string;
+    value: string;
+    readAloud?: boolean;    
+}
+
+type MultiselectFieldValidation = {
+    validate: boolean;
+    selectOptions?: MultiselectOption[];
+}
+
 export class MultiselectField extends Field {
-    public multiselectFieldValidation?: SelectFieldValidation;
+    public multiselectFieldValidation?: MultiselectFieldValidation;
     constructor(name: string, question: string, eventConfig?: FieldEventConfig) {
         super(name, question, FieldType.MULTISELECT, eventConfig);
         this.multiselectFieldValidation = {
@@ -148,10 +167,10 @@ export class MultiselectField extends Field {
             selectOptions: [],
         };
     }
-    addSelectOption({label, value, readAloud}: {label: string, value: string, readAloud?: boolean}): SelectOption {
+    addSelectOption({label, value, readAloud}: {label: string, value: string, readAloud?: boolean}): Field {
         const option = new SelectOption(label, value, readAloud);
         this.multiselectFieldValidation?.selectOptions?.push(option);
-        return option;
+        return this;
     }
 }
 
@@ -175,8 +194,9 @@ export class TextAreaField extends Field {
     constructor(name: string, question: string, eventConfig?: FieldEventConfig) {
         super(name, question, FieldType.TEXTAREA, eventConfig);
     }
-    addValidation(validation: TextAreaFieldValidation): void {
+    addValidation(validation: TextAreaFieldValidation): Field {
         this.textAreaFieldValidation = validation;
+        return this;
     }
 }
 type TextAreaFieldValidation = {

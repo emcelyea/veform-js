@@ -184,6 +184,7 @@ export class Veform {
                     this.log('Peer connection connected', 'debug');
                 } else if (this.peerConnection?.iceConnectionState === 'disconnected') {
                     this.log('Peer connection disconnected', 'debug');
+                    this.stop();
                 } else if (this.peerConnection?.iceConnectionState === 'failed') {
                    if (this.eventHandlers.onCriticalError) {
                     this.eventHandlers.onCriticalError('Connection to server failed');
