@@ -1,5 +1,6 @@
 import { Field, VeformBuilder } from './veform-builder';
 
+// const DEFAULT_SERVER_URL = 'ws://localhost:8080/veform-api/ws';
 const DEFAULT_SERVER_URL = 'wss://api.veform.co/veform-api/ws';
 type EventHandlers = {
     /** 
@@ -69,12 +70,10 @@ export class Veform {
     private audioElement: HTMLAudioElement | null = null;
     public debug: boolean = false;
     public verbose: boolean = false;
-    constructor(fields: Field[] | VeformBuilder) {
-        let form: {fields: Field[]};
-        if (fields instanceof VeformBuilder) {
-            this.form = {fields: fields.getFields()};
-        } else if (Array.isArray(fields)) {
-            this.form = {fields: fields};
+    public finished: boolean = false;
+    constructor(builder: VeformBuilder) {
+        if (builder instanceof VeformBuilder) {
+            this.form = {fields: builder.getFields()};
         } else {
             this.log(`Invalid form fields provided`, 'error');
             this.form = {fields: []};
@@ -130,17 +129,23 @@ export class Veform {
             this.log('start called while already running', 'error');
             return false;
         }
-        if (this.eventHandlers.onLoadingStarted) {
-            this.eventHandlers.onLoadingStarted();
-        }
+
         try {
             if (token.startsWith('http')) {
                 this.log(`Fetching token from URL: ${token}`, 'debug');
-                token = await fetch(token, { method: 'POST' }).then(response => response.json()).then(data => data.token || data);
-                this.log(`Fetched token from URL: ${token}`, 'debug');
+                const tokenResponse = await fetch(token, { method: 'POST' }).then(response => response.json())
+                if (tokenResponse.token) {
+                    token = tokenResponse.token;
+                } else {
+                    token = tokenResponse;
+                }
+                if (!token) {
+                    this.log(`No token provided or returned from token URL, got: ${tokenResponse}`, 'error');
+                } else {
+                    this.log(`Fetched token from URL: ${token}`, 'debug');
+                }
             }
             if (!token) {
-                this.log('No token provided or returned from token URL', 'error');
                 if (this.eventHandlers.onCriticalError) {
                     this.eventHandlers.onCriticalError('No token provided or returned from token URL');
                 } else if (this.eventHandlers.onError) {
@@ -161,6 +166,9 @@ export class Veform {
                 video: false,
             });
 
+            if (this.eventHandlers.onLoadingStarted) {
+                this.eventHandlers.onLoadingStarted();
+            }
             // setup local peerconnection
             this.peerConnection = new RTCPeerConnection({
                 iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
@@ -184,6 +192,11 @@ export class Veform {
                     this.log('Peer connection connected', 'debug');
                 } else if (this.peerConnection?.iceConnectionState === 'disconnected') {
                     this.log('Peer connection disconnected', 'debug');
+                    if (!this.finished && this.eventHandlers.onCriticalError) {
+                        this.eventHandlers.onCriticalError('Connection to server lost');
+                    } else if (!this.finished && this.eventHandlers.onError) {
+                        this.eventHandlers.onError('Connection to server lost');
+                    }
                     this.stop();
                 } else if (this.peerConnection?.iceConnectionState === 'failed') {
                    if (this.eventHandlers.onCriticalError) {
@@ -205,7 +218,11 @@ export class Veform {
                 this.audioElement.play().catch((e) => this.log(`Audio element play error: ${e}`, 'error'));
             };
 
-            this.wsConnection = new WebSocket(DEFAULT_SERVER_URL + '?token=' + token);
+            this.wsConnection = new WebSocket(DEFAULT_SERVER_URL + '?token=' + encodeURIComponent(token));
+            this.wsConnection.onerror = (event) => {
+                this.log(`WS error: ${event}`, 'error');
+                this.stop();
+            }
             this.wsConnection.onmessage = (event) => {
                 const message = JSON.parse(event.data);
                 if (!this.peerConnection) {
@@ -327,11 +344,13 @@ export class Veform {
         this.log(`WS message received: ${message.type}, ${this.verbose ? `Payload: ${JSON.stringify(message.payload)}` : ''}`, 'debug');
         switch (message.type) {
             case "event-start":
+                this.finished = false;
                 if (this.eventHandlers.onRunningStarted) {
                     this.eventHandlers.onRunningStarted();
                 }
                 return;
             case "event-end":
+                this.finished = true;
                 if (this.eventHandlers.onFinished) {
                     this.eventHandlers.onFinished();
                 }

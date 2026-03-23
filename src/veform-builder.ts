@@ -9,7 +9,7 @@ export enum FieldType {
 }
 
 type EventHandlers = {
-    onFocus?: (previousName: string) => boolean;
+    onFocus?: (previousName: string) => void;
     onChange?: (answer: string | number | boolean) => void;
 }
 
@@ -57,7 +57,6 @@ export type FieldEventConfig = {
 export enum FieldEvents {
     VALID_ANSWER = "validAnswer",
     INVALID_ANSWER = "invalidAnswer",
-    MOVE_REQUESTED = "moveRequested",
     END_REQUESTED = "endRequested",
     VALID_YES_ANSWER = "validYesAnswer",
     VALID_NO_ANSWER = "validNoAnswer",
@@ -88,7 +87,6 @@ type TextFieldPatterns = 'email' | 'phone' | 'url' | 'date' | 'name';
 type TextFieldValidation = {
     validate: boolean;
     pattern?: TextFieldPatterns;
-    readback?: boolean;
 }
 
 export class NumberField extends Field {
@@ -96,8 +94,9 @@ export class NumberField extends Field {
     constructor(name: string, question: string, eventConfig?: FieldEventConfig) {
         super(name, question, FieldType.NUMBER, eventConfig);
     }
-    addValidation(validation: NumberFieldValidation): void {
+    addValidation(validation: NumberFieldValidation): Field {
         this.numberFieldValidation = validation;
+        return this;
     }
 }
 type NumberFieldValidation = {
@@ -185,8 +184,6 @@ export class YesNoField extends Field {
 }
 type YesNoFieldValidation = {
     validate: boolean;
-    requireYes?: boolean;
-    requireNo?: boolean;
 }
 
 export class TextAreaField extends Field {
@@ -255,23 +252,12 @@ export class VeformBuilder {
         return field;
     }
 
-
     getField(name: string): Field | undefined {
         return this.fields.find(field => field.name === name);
     }
 
     getFields(): Field[] {
         return this.fields;
-    }
-
-    setField(name: string, field: Field): boolean {
-        const index = this.fields.findIndex(field => field.name === name);
-        if (index !== -1) {
-            this.log(`Field with name ${name} already exists, replacing with this one`, 'warn');
-            this.fields[index] = field;
-            return true;
-        }
-        return false;
     }
 
     removeField(name: string): boolean {
