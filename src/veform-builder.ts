@@ -208,10 +208,44 @@ export class InfoField extends Field {
     }
 }
 
+export enum Voices {
+    FEMALE_1 = 'female-1',
+    FEMALE_2 = 'female-2',
+    MALE_1 = 'male-1',
+    MALE_2 = 'male-2',
+}
+export enum VoiceLanguage {
+    EN_US = 'en-US',
+    EN_GB = 'en-GB',
+    EN_AU = 'en-AU',
+    // FR_FR = 'fr-FR',
+    // FR_CA = 'fr-CA',
+    // DE_DE = 'de-DE',
+    // ES_ES = 'es-ES',
+    // ES_US = 'es-US',
+}
+export type VoiceOptions = {
+    voice: Voices;
+    language: VoiceLanguage;
+}
+
+export type VeformConfig = {
+    voice?: VoiceOptions;
+}
 
 export class VeformBuilder {
     private fields: Field[] = [];
-
+    constructor(public config?: VeformConfig) {
+        if (!this.config) {
+            return;
+        }
+        if (this.config.voice?.language && !Object.values(VoiceLanguage).includes(this.config.voice?.language)) {
+            this.log(`Invalid language ${this.config.voice?.language}, using default language`, 'error');
+        }
+        if (this.config.voice?.voice && !Object.values(Voices).includes(this.config.voice?.voice)) {
+            this.log(`Invalid voice ${this.config.voice?.voice}, using default voice`, 'error');
+        }
+    }
     addField({name, question, type}: Field): Field | null {
         if (this.getField(name)) {
             this.log(`Field with name ${name} already exists`, 'error');

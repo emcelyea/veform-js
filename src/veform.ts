@@ -1,6 +1,6 @@
-import { Field, VeformBuilder } from './veform-builder';
+import { Field, VeformBuilder, VeformConfig } from './veform-builder';
 
-// const DEFAULT_SERVER_URL = 'ws://localhost:8080/veform-api/ws';
+ //const DEFAULT_SERVER_URL = 'ws://localhost:8080/veform-api/ws';
 const DEFAULT_SERVER_URL = 'wss://api.veform.co/veform-api/ws';
 type EventHandlers = {
     /** 
@@ -62,7 +62,7 @@ type EventHandlers = {
 
 export class Veform {
     private connected: boolean = false;
-    private form: {fields: Field[]};
+    private form: {config: VeformConfig, fields: Field[]};
     private eventHandlers: EventHandlers = {};
     private localStream: MediaStream | null = null;
     private peerConnection: RTCPeerConnection | null = null;
@@ -73,10 +73,9 @@ export class Veform {
     public finished: boolean = false;
     constructor(builder: VeformBuilder) {
         if (builder instanceof VeformBuilder) {
-            this.form = {fields: builder.getFields()};
+            this.form = {config: builder.config || {}, fields: builder.getFields()};
         } else {
-            this.log(`Invalid form fields provided`, 'error');
-            this.form = {fields: []};
+            throw new Error('Veform: Invalid builder provided');
         }
     }
 

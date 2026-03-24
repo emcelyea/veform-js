@@ -1,0 +1,719 @@
+gram END MSG: My phone doesn't work.
+GetStaticAudio sending, audioType: flavorNeutral, text: Okay., voice: female-1, lang: en-GB
+ConversationForField: 
+Assistant: Can you describe your problem for tech support?
+User: my phone doesn't work.
+Validating field: tech-support textarea
+ConversationForIntents: 
+Assistant: Tech support or shipping issue?
+OPTIONS LIST:
+ 1. Technical Support
+2. Shipping issue
+User: tech support?
+Assistant: valid|Technical Support|||Got it
+Assistant: Can you describe your problem for tech support?
+User: my phone doesn't work.
+INTENT VALIDATION: Validating intent
+parseTextAreaValidationResponse, fullResponse: valid|my phone doesn't work|||Got it
+%!(EXTRA int=27)Field response: Got it true my phone doesn't work
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Got it
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it
+Value: my phone doesn't work
+Sending timed event: GET_LLM_RESPONSE
+INTENT VALIDATION: Intent resolved: none
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: ChangeAnswerName: , ChangeAnswerResolved: true, ChangeAnswerOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it
+Value: my phone doesn't work
+GENRESOLVE FINAL STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it
+Value: my phone doesn't work
+CState, inputResponse FIELD_VALID field: tech-support, rawResponse: 
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextUntilQuestionHit, nextFieldName: user-email, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: user-email, action: FIELD_VALID
+Sending timed event: GET_LLM_RESPONSE
+CSTATE outputChannel length: 0
+CState outputChannel, fieldName: user-email, r: What is the best email for us to get back to you at?
+TTSAdapter, sending text: What is the best email for us to get back to you at?
+AudioMON, EndSystemTalking
+Sending timed event: SYNTHESIZE_SPEECH
+TTSAdapter, sendAudio: What is the best email for us to get back to you at?
+AudioMON, StartSystemTalking
+
+Sending timed event: TIME_TO_FIRST_AUDIO_OUT
+AudioMON, EndSystemTalking
+Dgram START MSG: Dog
+STTAdapter, StartTalking
+AudioMonitor Response
+
+Dgram END MSG: Dogs are good. Number two at, uh, Yahoo dot com.
+ConversationForField: 
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+GetStaticAudio sending, audioType: flavorNeutral, text: Okay., voice: female-1, lang: en-GB
+Validating field: user-email text
+ConversationForIntents: 
+Assistant: Tech support or shipping issue?
+OPTIONS LIST:
+ 1. Technical Support
+2. Shipping issue
+User: tech support?
+Assistant: valid|Technical Support|||Got it
+Assistant: Can you describe your problem for tech support?
+User: my phone doesn't work.
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+INTENT VALIDATION: Validating intent
+Field response: Setting that to number2@yahoo.com! true number2@yahoo.com
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Setting that to number2@yahoo.com!
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Setting that to number2@yahoo.com!
+Value: number2@yahoo.com
+GENRESOLVE FINAL STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Setting that to number2@yahoo.com!
+Value: number2@yahoo.com
+CState, inputResponse FIELD_VALID field: user-email, rawResponse: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextFieldNameForResponse, currentFieldIndex: 3, total fields: 7
+CState getNextUntilQuestionHit, nextFieldName: review, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: review, action: FIELD_VALID
+Error sending Groq request: Post "https://api.groq.com/openai/v1/chat/completions": context canceled
+Sending timed event: GET_LLM_RESPONSE
+CSTATE outputChannel length: 0
+CState outputChannel, fieldName: review, r: Are you ready to submit?
+TTSAdapter, sending text: Are you ready to submit?
+AudioMON, EndSystemTalking
+Sending timed event: SYNTHESIZE_SPEECH
+TTSAdapter, sendAudio: Are you ready to submit?
+AudioMON, StartSystemTalking
+
+Sending timed event: TIME_TO_FIRST_AUDIO_OUT
+AudioMON, EndSystemTalking
+Dgram START MSG: No.
+STTAdapter, StartTalking
+AudioMonitor Response
+
+Dgram END MSG: No. My email is supposed to say dogs are good number two.
+GetStaticAudio sending, audioType: flavorNeutral, text: Okay., voice: female-1, lang: en-GB
+ConversationForField: 
+ConversationForIntents: 
+Assistant: Tech support or shipping issue?
+OPTIONS LIST:
+ 1. Technical Support
+2. Shipping issue
+User: tech support?
+Assistant: valid|Technical Support|||Got it
+Assistant: Can you describe your problem for tech support?
+User: my phone doesn't work.
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+INTENT VALIDATION: Validating intent
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+Validating field: review yesNo
+Field response: Should be yes or no false false
+GENRESOLVE UDPATE: FieldValid: false,
+ FieldValidResolved: true,
+ FieldValidOutput: Should be yes or no
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: false, FieldValidResolved: true, FieldValidOutput: Should be yes or no
+Value: false
+Sending timed event: GET_LLM_RESPONSE
+INTENT VALIDATION: Intent resolved: none
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: ChangeAnswerName: , ChangeAnswerResolved: true, ChangeAnswerOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: false, FieldValidResolved: true, FieldValidOutput: Should be yes or no
+Value: false
+GENRESOLVE FINAL STATUS: 
+FieldValid: false, FieldValidResolved: true, FieldValidOutput: Should be yes or no
+Value: false
+CState, inputResponse FIELD_INVALID field: review, rawResponse: 
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextUntilQuestionHit, nextFieldName: , endForm: false
+Sending timed event: GET_LLM_RESPONSE
+CSTATE outputChannel length: 0
+CState outputChannel, fieldName: review, r: Should be yes or no
+TTSAdapter, sending text: Should be yes or no
+Sending timed event: SYNTHESIZE_SPEECH
+TTSAdapter, sendAudio: Should be yes or no
+AudioMON, StartSystemTalking
+
+Sending timed event: TIME_TO_FIRST_AUDIO_OUT
+AudioMON, EndSystemTalking
+Dgram silence warning
+STTAdapter, SilenceWarning
+GetStaticAudio sending, audioType: silenceWarning, text: Are you still there?, voice: female-1, lang: en-GB
+AudioMON, EndSystemTalking
+Dgram START MSG: Yes,
+STTAdapter, StartTalking
+AudioMonitor Response
+
+Dgram END MSG: Yeah. Change my email to dog circuit number two at Yahoo dot com.
+GetStaticAudio sending, audioType: flavorNeutral, text: Alright., voice: female-1, lang: en-GB
+ConversationForField: 
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+Validating field: review yesNo
+ConversationForIntents: 
+Assistant: Tech support or shipping issue?
+OPTIONS LIST:
+ 1. Technical Support
+2. Shipping issue
+User: tech support?
+Assistant: valid|Technical Support|||Got it
+Assistant: Can you describe your problem for tech support?
+User: my phone doesn't work.
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+INTENT VALIDATION: Validating intent
+INTENT VALIDATION: Intent resolved: changeAnswer
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+Value: <nil>
+Field response: Got it true true
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Got it
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it
+Value: true
+Sending timed event: GET_LLM_RESPONSE
+parseChangeAnswerResponse, fullresponse: true|4|||Updating your email.
+parseChangeAnswerResponse, field: user-email: Question: What is the best email for us to get back to you at?
+ Answer: number2@yahoo.com
+parseChangeAnswerResponse, fieldNameLimiter: 10
+fieldName: user-email
+GENRESOLVE UDPATE: ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it
+Value: true
+GENRESOLVE FINAL STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it
+Value: true
+CState, inputResponse CHANGE_ANSWER field: review, rawResponse: true|4|||Updating your email.
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextUntilQuestionHit, nextFieldName: user-email, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: user-email, action: CHANGE_ANSWER
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: ChangeAnswerName: , ChangeAnswerResolved: true, ChangeAnswerOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+Value: <nil>
+ConversationForField: 
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+Sending timed event: GET_LLM_RESPONSE
+Sending timed event: GET_LLM_RESPONSE
+Validating field: user-email text
+Field response: Updating to dogcircuitnumber2@yahoo.com! true dogcircuitnumber2@yahoo.com
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Updating to dogcircuitnumber2@yahoo.com!
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Updating to dogcircuitnumber2@yahoo.com!
+Value: dogcircuitnumber2@yahoo.com
+GENRESOLVE FINAL STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Updating to dogcircuitnumber2@yahoo.com!
+Value: dogcircuitnumber2@yahoo.com
+CState, inputResponse FIELD_VALID field: user-email, rawResponse: valid|dogcircuitnumber2@yahoo.com|||Updating to dogcircuitnumber2@yahoo.com!
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextFieldNameForResponse, currentFieldIndex: 3, total fields: 7
+CState getNextUntilQuestionHit, nextFieldName: review, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: review, action: FIELD_VALID
+Sending timed event: GET_LLM_RESPONSE
+CSTATE outputChannel length: 0
+CState outputChannel, fieldName: review, r: Are you ready to submit?
+TTSAdapter, sending text: Are you ready to submit?
+AudioMON, EndSystemTalking
+Sending timed event: SYNTHESIZE_SPEECH
+TTSAdapter, sendAudio: Are you ready to submit?
+AudioMON, StartSystemTalking
+
+Sending timed event: TIME_TO_FIRST_AUDIO_OUT
+AudioMON, EndSystemTalking
+Dgram START MSG: No.
+STTAdapter, StartTalking
+AudioMonitor Response
+
+Dgram END MSG: No. Dogs are good. Number two at Yahoo dot com.
+ConversationForField: 
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+Assistant: Are you ready to submit?
+User: no. dogs are good. number two at yahoo dot com.
+ConversationForIntents: 
+Assistant: valid|Technical Support|||Got it
+Assistant: Can you describe your problem for tech support?
+Validating field: review yesNo
+User: my phone doesn't work.
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+Assistant: valid|dogcircuitnumber2@yahoo.com|||Updating to dogcircuitnumber2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no. dogs are good. number two at yahoo dot com.
+INTENT VALIDATION: Validating intent
+GetStaticAudio sending, audioType: flavorNeutral, text: Alright., voice: female-1, lang: en-GB
+INTENT VALIDATION: Intent resolved: changeAnswer
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+Value: <nil>
+Field response: Should be yes or no? false false
+GENRESOLVE UDPATE: FieldValid: false,
+ FieldValidResolved: true,
+ FieldValidOutput: Should be yes or no?
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: false, FieldValidResolved: true, FieldValidOutput: Should be yes or no?
+Value: false
+Sending timed event: GET_LLM_RESPONSE
+parseChangeAnswerResponse, fullresponse: true|4|||Updating your email.
+parseChangeAnswerResponse, field: user-email: Question: What is the best email for us to get back to you at?
+ Answer: dogcircuitnumber2@yahoo.com
+parseChangeAnswerResponse, fieldNameLimiter: 10
+fieldName: user-email
+GENRESOLVE UDPATE: ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+FieldValid: false, FieldValidResolved: true, FieldValidOutput: Should be yes or no?
+Value: false
+GENRESOLVE FINAL STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+FieldValid: false, FieldValidResolved: true, FieldValidOutput: Should be yes or no?
+Value: false
+CState, inputResponse CHANGE_ANSWER field: review, rawResponse: true|4|||Updating your email.
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextUntilQuestionHit, nextFieldName: user-email, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: user-email, action: CHANGE_ANSWER
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: ChangeAnswerName: , ChangeAnswerResolved: true, ChangeAnswerOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+Value: <nil>
+ConversationForField: 
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+Assistant: valid|dogcircuitnumber2@yahoo.com|||Updating to dogcircuitnumber2@yahoo.com!
+User: no. dogs are good. number two at yahoo dot com.
+Validating field: user-email text
+Sending timed event: GET_LLM_RESPONSE
+Sending timed event: GET_LLM_RESPONSE
+Field response: Reverted back to number2@yahoo.com! true number2@yahoo.com
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Reverted back to number2@yahoo.com!
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Reverted back to number2@yahoo.com!
+Value: number2@yahoo.com
+GENRESOLVE FINAL STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Reverted back to number2@yahoo.com!
+Value: number2@yahoo.com
+CState, inputResponse FIELD_VALID field: user-email, rawResponse: valid|number2@yahoo.com|||Reverted back to number2@yahoo.com!
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextFieldNameForResponse, currentFieldIndex: 3, total fields: 7
+CState getNextUntilQuestionHit, nextFieldName: review, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: review, action: FIELD_VALID
+Sending timed event: GET_LLM_RESPONSE
+CSTATE outputChannel length: 0
+CState outputChannel, fieldName: review, r: Are you ready to submit?
+TTSAdapter, sending text: Are you ready to submit?
+AudioMON, EndSystemTalking
+Sending timed event: SYNTHESIZE_SPEECH
+TTSAdapter, sendAudio: Are you ready to submit?
+AudioMON, StartSystemTalking
+
+Sending timed event: TIME_TO_FIRST_AUDIO_OUT
+AudioMON, EndSystemTalking
+Dgram START MSG: No.
+STTAdapter, StartTalking
+AudioMonitor Response
+
+Dgram END MSG: No dogs are good number two at Yahoo dot com.
+ConversationForField: 
+Assistant: Are you ready to submit?
+GetStaticAudio sending, audioType: flavorNeutral, text: Okay., voice: female-1, lang: en-GB
+User: no. my email is supposed to say dogs are good number two.
+Assistant: Are you ready to submit?
+Assistant: Are you ready to submit?
+User: no dogs are good number two at yahoo dot com.
+Validating field: review yesNo
+ConversationForIntents: 
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+Assistant: valid|dogcircuitnumber2@yahoo.com|||Updating to dogcircuitnumber2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no. dogs are good. number two at yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Reverted back to number2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no dogs are good number two at yahoo dot com.
+INTENT VALIDATION: Validating intent
+INTENT VALIDATION: Intent resolved: changeAnswer
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+Value: <nil>
+Field response: Should be yes or no false false
+GENRESOLVE UDPATE: FieldValid: false,
+ FieldValidResolved: true,
+ FieldValidOutput: Should be yes or no
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: false, FieldValidResolved: true, FieldValidOutput: Should be yes or no
+Value: false
+Sending timed event: GET_LLM_RESPONSE
+AudioMON, EndSystemTalking
+parseChangeAnswerResponse, fullresponse: true|4|||Updating your email.
+parseChangeAnswerResponse, field: user-email: Question: What is the best email for us to get back to you at?
+ Answer: number2@yahoo.com
+parseChangeAnswerResponse, fieldNameLimiter: 10
+fieldName: user-email
+GENRESOLVE UDPATE: ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+FieldValid: false, FieldValidResolved: true, FieldValidOutput: Should be yes or no
+Value: false
+GENRESOLVE FINAL STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+FieldValid: false, FieldValidResolved: true, FieldValidOutput: Should be yes or no
+Value: false
+CState, inputResponse CHANGE_ANSWER field: review, rawResponse: true|4|||Updating your email.
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextUntilQuestionHit, nextFieldName: user-email, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: user-email, action: CHANGE_ANSWER
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: ChangeAnswerName: , ChangeAnswerResolved: true, ChangeAnswerOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+Value: <nil>
+Sending timed event: GET_LLM_RESPONSE
+Sending timed event: GET_LLM_RESPONSE
+ConversationForField: 
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+Assistant: valid|dogcircuitnumber2@yahoo.com|||Updating to dogcircuitnumber2@yahoo.com!
+User: no. dogs are good. number two at yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Reverted back to number2@yahoo.com!
+User: no dogs are good number two at yahoo dot com.
+Validating field: user-email text
+Field response: Updated to dogsaregoodnumber2@yahoo.com! true dogsaregoodnumber2@yahoo.com
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Updated to dogsaregoodnumber2@yahoo.com!
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Updated to dogsaregoodnumber2@yahoo.com!
+Value: dogsaregoodnumber2@yahoo.com
+GENRESOLVE FINAL STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Updated to dogsaregoodnumber2@yahoo.com!
+Value: dogsaregoodnumber2@yahoo.com
+CState, inputResponse FIELD_VALID field: user-email, rawResponse: valid|dogsaregoodnumber2@yahoo.com|||Updated to dogsaregoodnumber2@yahoo.com!
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextFieldNameForResponse, currentFieldIndex: 3, total fields: 7
+CState getNextUntilQuestionHit, nextFieldName: review, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: review, action: FIELD_VALID
+Sending timed event: GET_LLM_RESPONSE
+CSTATE outputChannel length: 0
+CState outputChannel, fieldName: review, r: Are you ready to submit?
+TTSAdapter, sending text: Are you ready to submit?
+Sending timed event: SYNTHESIZE_SPEECH
+TTSAdapter, sendAudio: Are you ready to submit?
+AudioMON, StartSystemTalking
+
+Sending timed event: TIME_TO_FIRST_AUDIO_OUT
+AudioMON, EndSystemTalking
+Dgram START MSG: Yeah.
+STTAdapter, StartTalking
+AudioMonitor Response
+
+Dgram END MSG: Yes.
+GetStaticAudio sending, audioType: flavorNeutral, text: Alright., voice: female-1, lang: en-GB
+ConversationForField: 
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+Assistant: Are you ready to submit?
+Assistant: Are you ready to submit?
+Assistant: Are you ready to submit?
+User: yes.
+ConversationForIntents: 
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+Assistant: valid|dogcircuitnumber2@yahoo.com|||Updating to dogcircuitnumber2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no. dogs are good. number two at yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Reverted back to number2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no dogs are good number two at yahoo dot com.
+Assistant: valid|dogsaregoodnumber2@yahoo.com|||Updated to dogsaregoodnumber2@yahoo.com!
+Assistant: Are you ready to submit?
+User: yes.
+INTENT VALIDATION: Validating intent
+Validating field: review yesNo
+Field response: Got it. true true
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Got it.
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it.
+Value: true
+Sending timed event: GET_LLM_RESPONSE
+INTENT VALIDATION: Intent resolved: changeAnswer
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it.
+Value: true
+parseChangeAnswerResponse, fullresponse: true|4|||Updating your email.
+parseChangeAnswerResponse, field: user-email: Question: What is the best email for us to get back to you at?
+ Answer: dogsaregoodnumber2@yahoo.com
+parseChangeAnswerResponse, fieldNameLimiter: 10
+fieldName: user-email
+GENRESOLVE UDPATE: ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it.
+Value: true
+GENRESOLVE FINAL STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating your email.
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it.
+Value: true
+CState, inputResponse CHANGE_ANSWER field: review, rawResponse: true|4|||Updating your email.
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextUntilQuestionHit, nextFieldName: user-email, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: user-email, action: CHANGE_ANSWER
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: ChangeAnswerName: , ChangeAnswerResolved: true, ChangeAnswerOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+Value: <nil>
+Sending timed event: GET_LLM_RESPONSE
+ConversationForField: 
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+Assistant: valid|dogcircuitnumber2@yahoo.com|||Updating to dogcircuitnumber2@yahoo.com!
+User: no. dogs are good. number two at yahoo dot com.
+Sending timed event: GET_LLM_RESPONSE
+Assistant: valid|number2@yahoo.com|||Reverted back to number2@yahoo.com!
+User: no dogs are good number two at yahoo dot com.
+Assistant: valid|dogsaregoodnumber2@yahoo.com|||Updated to dogsaregoodnumber2@yahoo.com!
+User: yes.
+Validating field: user-email text
+Field response: Confirming dogsaregoodnumber2@yahoo.com! true dogsaregoodnumber2@yahoo.com
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Confirming dogsaregoodnumber2@yahoo.com!
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Confirming dogsaregoodnumber2@yahoo.com!
+Value: dogsaregoodnumber2@yahoo.com
+GENRESOLVE FINAL STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Confirming dogsaregoodnumber2@yahoo.com!
+Value: dogsaregoodnumber2@yahoo.com
+CState, inputResponse FIELD_VALID field: user-email, rawResponse: valid|dogsaregoodnumber2@yahoo.com|||Confirming dogsaregoodnumber2@yahoo.com!
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextFieldNameForResponse, currentFieldIndex: 3, total fields: 7
+CState getNextUntilQuestionHit, nextFieldName: review, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: review, action: FIELD_VALID
+Sending timed event: GET_LLM_RESPONSE
+CSTATE outputChannel length: 0
+CState outputChannel, fieldName: review, r: Are you ready to submit?
+TTSAdapter, sending text: Are you ready to submit?
+AudioMON, EndSystemTalking
+Sending timed event: SYNTHESIZE_SPEECH
+TTSAdapter, sendAudio: Are you ready to submit?
+AudioMON, StartSystemTalking
+
+Sending timed event: TIME_TO_FIRST_AUDIO_OUT
+AudioMON, EndSystemTalking
+Dgram START MSG: Yes.
+STTAdapter, StartTalking
+AudioMonitor Response
+
+Dgram END MSG: Yeah.
+ConversationForField: 
+Assistant: Are you ready to submit?
+User: no. my email is supposed to say dogs are good number two.
+ConversationForIntents: 
+Assistant: valid|dogcircuitnumber2@yahoo.com|||Updating to dogcircuitnumber2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no. dogs are good. number two at yahoo dot com.
+Assistant: Are you ready to submit?
+Assistant: Are you ready to submit?
+Assistant: Are you ready to submit?
+Assistant: Are you ready to submit?
+User: yeah.
+GetStaticAudio sending, audioType: flavorNeutral, text: Understood., voice: female-1, lang: en-GB
+Validating field: review yesNo
+Assistant: valid|number2@yahoo.com|||Reverted back to number2@yahoo.com!
+Assistant: Are you ready to submit?
+User: no dogs are good number two at yahoo dot com.
+Assistant: valid|dogsaregoodnumber2@yahoo.com|||Updated to dogsaregoodnumber2@yahoo.com!
+Assistant: Are you ready to submit?
+User: yes.
+Assistant: valid|dogsaregoodnumber2@yahoo.com|||Confirming dogsaregoodnumber2@yahoo.com!
+Assistant: Are you ready to submit?
+User: yeah.
+INTENT VALIDATION: Validating intent
+Field response: Got it. true true
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Got it.
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it.
+Value: true
+Sending timed event: GET_LLM_RESPONSE
+INTENT VALIDATION: Intent resolved: changeAnswer
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it.
+Value: true
+parseChangeAnswerResponse, fullresponse: true|4|||Updating email address.
+parseChangeAnswerResponse, field: user-email: Question: What is the best email for us to get back to you at?
+ Answer: dogsaregoodnumber2@yahoo.com
+parseChangeAnswerResponse, fieldNameLimiter: 10
+fieldName: user-email
+GENRESOLVE UDPATE: ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating email address.
+testResponseStatus, highValidity: false
+GENRESOLVE STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating email address.
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it.
+Value: true
+GENRESOLVE FINAL STATUS: 
+ChangeAnswerName: user-email, ChangeAnswerResolved: true, ChangeAnswerOutput: Updating email address.
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Got it.
+Value: true
+CState, inputResponse CHANGE_ANSWER field: review, rawResponse: true|4|||Updating email address.
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextUntilQuestionHit, nextFieldName: user-email, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: user-email, action: CHANGE_ANSWER
+GENRESOLVE UDPATE: End: false, EndResolved: true, EndOutput: 
+GENRESOLVE UDPATE: ChangeAnswerName: , ChangeAnswerResolved: true, ChangeAnswerOutput: 
+GENRESOLVE UDPATE: MoveToName: , MoveToNameResolved: true, MoveToNameOutput: , MoveToResponseType: 
+GENRESOLVE UDPATE: Question: false, QuestionResolved: true, QuestionOutput: 
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+Value: <nil>
+Sending timed event: GET_LLM_RESPONSE
+Sending timed event: GET_LLM_RESPONSE
+ConversationForField: 
+Assistant: What is the best email for us to get back to you at?
+User: dogs are good. number two at, uh, yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Setting that to number2@yahoo.com!
+User: yeah. change my email to dog circuit number two at yahoo dot com.
+Assistant: valid|dogcircuitnumber2@yahoo.com|||Updating to dogcircuitnumber2@yahoo.com!
+User: no. dogs are good. number two at yahoo dot com.
+Assistant: valid|number2@yahoo.com|||Reverted back to number2@yahoo.com!
+User: no dogs are good number two at yahoo dot com.
+Assistant: valid|dogsaregoodnumber2@yahoo.com|||Updated to dogsaregoodnumber2@yahoo.com!
+User: yes.
+Assistant: valid|dogsaregoodnumber2@yahoo.com|||Confirming dogsaregoodnumber2@yahoo.com!
+User: yeah.
+Validating field: user-email text
+Field response: Still set to dogsaregoodnumber2@yahoo.com! true dogsaregoodnumber2@yahoo.com
+GENRESOLVE UDPATE: FieldValid: true,
+ FieldValidResolved: true,
+ FieldValidOutput: Still set to dogsaregoodnumber2@yahoo.com!
+testResponseStatus, highValidity: true
+GENRESOLVE STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Still set to dogsaregoodnumber2@yahoo.com!
+Value: dogsaregoodnumber2@yahoo.com
+GENRESOLVE FINAL STATUS: 
+FieldValid: true, FieldValidResolved: true, FieldValidOutput: Still set to dogsaregoodnumber2@yahoo.com!
+Value: dogsaregoodnumber2@yahoo.com
+CState, inputResponse FIELD_VALID field: user-email, rawResponse: valid|dogsaregoodnumber2@yahoo.com|||Still set to dogsaregoodnumber2@yahoo.com!
+Conversation State, cancelling any in flight requests
+Sending timed event: RESOLVE_INPUT_RESPONSE
+CState getNextFieldNameForResponse, currentFieldIndex: 3, total fields: 7
+CState getNextUntilQuestionHit, nextFieldName: review, endForm: false
+CState getNextUntilQuestionHit, nextFieldName: review, action: FIELD_VALID
+Sending timed event: GET_LLM_RESPONSE
+CSTATE outputChannel length: 0
+CState outputChannel, fieldName: review, r: Are you ready to submit?
+TTSAdapter, sending text: Are you ready to submit?
+Sending timed event: SYNTHESIZE_SPEECH
+TTSAdapter, sendAudio: Are you ready to submit?
+AudioMON, StartSystemTalking
