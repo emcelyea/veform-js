@@ -5,7 +5,8 @@ export enum FieldType {
     MULTISELECT = "multiselect",
     YESNO = "yesNo",
     NUMBER = "number",
-    INFO = "info"
+    INFO = "info",
+    INTENT = "intent"
 }
 
 type EventHandlers = {
@@ -83,7 +84,7 @@ export class TextField extends Field {
         return this
     }
 }
-type TextFieldPatterns = 'email' | 'phone' | 'url' | 'date' | 'name';
+type TextFieldPatterns = 'email' | 'phone' | 'url' | 'date' | 'time' | 'name';
 type TextFieldValidation = {
     validate: boolean;
     pattern?: TextFieldPatterns;
@@ -178,12 +179,23 @@ export class YesNoField extends Field {
     constructor(name: string, question: string, eventConfig?: FieldEventConfig) {
         super(name, question, FieldType.YESNO, eventConfig);
     }
-    addValidation(validation: YesNoFieldValidation): void {
+    addValidation(validation: YesNoFieldValidation): Field {
         this.yesNoFieldValidation = validation;
+        return this;
     }
 }
+
 type YesNoFieldValidation = {
     validate: boolean;
+}
+
+export class IntentField extends Field {
+    constructor(name: string, question: string, eventConfig?: FieldEventConfig) {
+        super(name, question, FieldType.INTENT, eventConfig);
+    }
+    addValidation(): Field {
+        return this;
+    }
 }
 
 export class TextAreaField extends Field {
@@ -231,14 +243,21 @@ export type VoiceOptions = {
 
 export type VeformConfig = {
     voice?: VoiceOptions;
+    localTime?: string;
+    description?: string;
 }
 
 export class VeformBuilder {
     private fields: Field[] = [];
     constructor(public config?: VeformConfig) {
         if (!this.config) {
+            this.config = {
+                localTime: localTime24(),
+                description: '',
+            };
             return;
         }
+        this.config.localTime = localTime24();
         if (this.config.voice?.language && !Object.values(VoiceLanguage).includes(this.config.voice?.language)) {
             this.log(`Invalid language ${this.config.voice?.language}, using default language`, 'error');
         }
@@ -268,6 +287,9 @@ export class VeformBuilder {
                 break;
             case FieldType.YESNO:
                 field = new YesNoField(name, question);
+                break;
+            case FieldType.INTENT:
+                field = new IntentField(name, question);
                 break;
             case FieldType.NUMBER:
                 field = new NumberField(name, question);
@@ -319,5 +341,11 @@ export class VeformBuilder {
         }
     }
 }
+
+function localTime24(): string {
+    const d = new Date();
+    const z = (n: number) => String(n).padStart(2, '0');
+    return `${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`;
+  }
 
 
