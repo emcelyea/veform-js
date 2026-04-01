@@ -1,7 +1,7 @@
 import { Field, VeformBuilder, VeformConfig } from './veform-builder';
 
- //const DEFAULT_SERVER_URL = 'ws://localhost:8080/veform-api/ws';
-const DEFAULT_SERVER_URL = 'wss://api.veform.co/veform-api/ws';
+ const DEFAULT_SERVER_URL = 'ws://localhost:8080/veform-api/ws';
+//const DEFAULT_SERVER_URL = 'wss://api.veform.co/veform-api/ws';
 type EventHandlers = {
     /** 
     * Called immediately after start() is called 
@@ -71,7 +71,7 @@ export class Veform {
     public debug: boolean = false;
     public verbose: boolean = false;
     public finished: boolean = false;
-    private static globalStarted: boolean = false;
+    public static running: boolean = false;
     constructor(builder: VeformBuilder) {
         if (builder instanceof VeformBuilder) {
             this.form = {config: builder.config || {}, fields: builder.getFields()};
@@ -120,18 +120,20 @@ export class Veform {
      * This will connect the client the the veform server with the current set of fields
      */
     async start(token: string) {
-        if (Veform.globalStarted) {
+        if (Veform.running) {
             this.log('start called while already started', 'error');
             return false;
         }
-        Veform.globalStarted = true;
+        Veform.running = true;
         if (!this.form?.fields || this.form?.fields.length === 0) {
             this.log('No fields provided', 'error');
+            Veform.running = false;
             return false;
         }
 
         if (this.connected || this.wsConnection || this.peerConnection || this.localStream) {
             this.log('start called while already running', 'error');
+            Veform.running = false;
             return false;
         }
 
@@ -156,7 +158,7 @@ export class Veform {
                 } else if (this.eventHandlers.onError) {
                     this.eventHandlers.onError('No token provided or returned from token URL');
                 }
-                Veform.globalStarted = false;
+                Veform.running = false;
                 return false;
             }
             this.audioElement = createAudioElement();
@@ -182,10 +184,12 @@ export class Veform {
             this.localStream.getTracks().forEach((track) => {
                 if (!this.localStream) {
                     this.log('Local stream failed to get user media', 'error');
+                    this.stop()
                     return;
                 }
                 if (!this.peerConnection) {
                     this.log('Peer connection failed to create', 'error');
+                    this.stop()
                     return;
                 }
                 this.peerConnection?.addTrack(track, this.localStream);
@@ -286,10 +290,7 @@ export class Veform {
             } else if (this.eventHandlers.onError) {
                 this.eventHandlers.onError(`Error starting conversation: ${error}`);
             }
-            this.connected = false;
-            this.wsConnection = null;
-            this.peerConnection = null;
-            this.localStream = null;
+            this.stop()
             return false;
         }
     }
@@ -307,7 +308,7 @@ export class Veform {
             track.stop();
         });
         this.localStream = null;
-        Veform.globalStarted = false;
+        Veform.running = false;
     }
 
     /**
@@ -457,4 +458,13 @@ function createAudioElement() {
     element.style.height = '100%';
     document.body.appendChild(element);
     return element;
+}
+
+/** 
+ * An instance of veform is actively connected 
+ * Only a single veform instance is allowed at one time
+ * Use this to update UI elements
+ */
+export function isRunning() {
+    return Veform.running;
 }
