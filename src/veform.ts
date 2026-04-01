@@ -71,6 +71,7 @@ export class Veform {
     public debug: boolean = false;
     public verbose: boolean = false;
     public finished: boolean = false;
+    private static globalStarted: boolean = false;
     constructor(builder: VeformBuilder) {
         if (builder instanceof VeformBuilder) {
             this.form = {config: builder.config || {}, fields: builder.getFields()};
@@ -119,6 +120,11 @@ export class Veform {
      * This will connect the client the the veform server with the current set of fields
      */
     async start(token: string) {
+        if (Veform.globalStarted) {
+            this.log('start called while already started', 'error');
+            return false;
+        }
+        Veform.globalStarted = true;
         if (!this.form?.fields || this.form?.fields.length === 0) {
             this.log('No fields provided', 'error');
             return false;
@@ -150,6 +156,7 @@ export class Veform {
                 } else if (this.eventHandlers.onError) {
                     this.eventHandlers.onError('No token provided or returned from token URL');
                 }
+                Veform.globalStarted = false;
                 return false;
             }
             this.audioElement = createAudioElement();
@@ -300,6 +307,7 @@ export class Veform {
             track.stop();
         });
         this.localStream = null;
+        Veform.globalStarted = false;
     }
 
     /**
@@ -353,6 +361,7 @@ export class Veform {
                 if (this.eventHandlers.onFinished) {
                     this.eventHandlers.onFinished();
                 }
+                this.stop();
                 return;
             case "event-audio-out-start":
                 if (this.eventHandlers.onAudioOutStart) {
