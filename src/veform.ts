@@ -463,7 +463,7 @@ function createAudioElement() {
 /** 
  * An instance of veform is actively connected 
  * Only a single veform instance is allowed at one time
- * Use this to update UI elements
+ * Use this to update UI
  */
 export function isRunning() {
     return Veform.running;
