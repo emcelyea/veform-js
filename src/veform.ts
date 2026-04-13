@@ -1,7 +1,7 @@
 import { Field, VeformBuilder, VeformConfig } from './veform-builder';
 
- const DEFAULT_SERVER_URL = 'ws://localhost:8080/veform-api/ws';
-//const DEFAULT_SERVER_URL = 'wss://api.veform.co/veform-api/ws';
+ //const DEFAULT_SERVER_URL = 'ws://localhost:8080/veform-api/ws';
+const DEFAULT_SERVER_URL = 'wss://api.veform.co/veform-api/ws';
 type EventHandlers = {
     /** 
     * Called immediately after start() is called 
@@ -114,7 +114,6 @@ export class Veform {
         this.eventHandlers.onFocusChanged = callback;
     }
 
-
     /**
      * Start the conversation
      * This will connect the client the the veform server with the current set of fields
@@ -162,7 +161,7 @@ export class Veform {
                 return false;
             }
             this.audioElement = createAudioElement();
-   
+
             // get local audio track
             this.localStream = await navigator.mediaDevices.getUserMedia({
                 audio: {
@@ -177,64 +176,25 @@ export class Veform {
             if (this.eventHandlers.onLoadingStarted) {
                 this.eventHandlers.onLoadingStarted();
             }
-            // setup local peerconnection
-            this.peerConnection = new RTCPeerConnection({
-                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-            });
-            this.localStream.getTracks().forEach((track) => {
-                if (!this.localStream) {
-                    this.log('Local stream failed to get user media', 'error');
-                    this.stop()
-                    return;
-                }
-                if (!this.peerConnection) {
-                    this.log('Peer connection failed to create', 'error');
-                    this.stop()
-                    return;
-                }
-                this.peerConnection?.addTrack(track, this.localStream);
-            });
 
-            this.peerConnection.oniceconnectionstatechange = () => {
-                this.log(`ICE connection state changed to: ${this.peerConnection?.iceConnectionState}`, 'debug');
-                if (this.peerConnection?.iceConnectionState === 'connected') {
-                    this.connected = true;
-                    this.log('Peer connection connected', 'debug');
-                } else if (this.peerConnection?.iceConnectionState === 'disconnected') {
-                    this.log('Peer connection disconnected', 'debug');
-                    if (!this.finished && this.eventHandlers.onCriticalError) {
-                        this.eventHandlers.onCriticalError('Connection to server lost');
-                    } else if (!this.finished && this.eventHandlers.onError) {
-                        this.eventHandlers.onError('Connection to server lost');
-                    }
-                    this.stop();
-                } else if (this.peerConnection?.iceConnectionState === 'failed') {
-                   if (this.eventHandlers.onCriticalError) {
-                    this.eventHandlers.onCriticalError('Connection to server failed');
-                   } else if (this.eventHandlers.onError) {
-                    this.eventHandlers.onError('Connection to server failed');
-                   }
-                   this.log('Connection to server failed, stopping conversation', 'error');
-                   this.stop();
-                }
-            };
-            this.peerConnection.ontrack = (event) => {
-                if (!this.audioElement) {
-                    this.log('Audio element not found', 'error');
-                    return;
-                }
-                const stream = event.streams[0];
-                this.audioElement.srcObject = stream;
-                this.audioElement.play().catch((e) => this.log(`Audio element play error: ${e}`, 'error'));
-            };
-
+            // Wait for TURN credentials from server before creating peer connection
             this.wsConnection = new WebSocket(DEFAULT_SERVER_URL + '?token=' + encodeURIComponent(token));
             this.wsConnection.onerror = (event) => {
                 this.log(`WS error: ${event}`, 'error');
                 this.stop();
             }
             this.wsConnection.onmessage = (event) => {
+                console.log('WS message received', event.data);
                 const message = JSON.parse(event.data);
+
+                // Handle TURN credentials first, before peer connection exists
+                if (message.type === "turn-credentials") {
+                    if (!this.peerConnection) {
+                        this.setupPeerConnection(message.payload.iceServers);
+                    }
+                    return;
+                }
+
                 if (!this.peerConnection) {
                     this.log('WS response, Peer connection not established', 'error');
                     return;
@@ -251,35 +211,10 @@ export class Veform {
                     this.resolveWsMessage(message);
                 }
             }
-            
-            this.wsConnection.onopen = async() => {
-                if (!this.peerConnection) {
-                    this.log('WS response, Peer connection not established', 'error');
-                    return;
-                }
-                const offer = await this.peerConnection.createOffer();
-                this.peerConnection.onicecandidate = (event) => {
-                    if (event.candidate) {
-                      this.log(`RTC: Sending candidate to server`, 'debug');
-                      this.wsConnection?.send(
-                        JSON.stringify({
-                          type: "ice-candidate",
-                          payload: event.candidate,
-                        }),
-                      );
-                    }
-                };
-                await this.peerConnection.setLocalDescription(offer);
-                this.log(`RTC: Sending offer to server`, 'debug');
-                this.wsConnection?.send(JSON.stringify({
-                    type: "offer",
-                    payload: this.peerConnection?.localDescription,
-                }));
-                this.log(`RTC: Sending form to server`, 'debug');
-                this.wsConnection?.send(JSON.stringify({
-                    type: "form",
-                    payload: this.form,
-                }));
+
+            this.wsConnection.onopen = () => {
+                // Credentials will be sent by server immediately
+                console.log('WS connection opened');
             };
   
             return true;
@@ -294,6 +229,103 @@ export class Veform {
             return false;
         }
     }
+    private async setupPeerConnection(iceServers: any[]) {
+        console.log('Setting up peer connection with ice servers', iceServers);
+        if (!this.localStream) {
+            this.log('Local stream not available', 'error');
+            return;
+        }
+
+        // Create peer connection with TURN credentials from server
+        this.peerConnection = new RTCPeerConnection({
+            iceServers: iceServers
+        });
+
+        this.localStream.getTracks().forEach((track) => {
+            if (!this.localStream) {
+                this.log('Local stream failed to get user media', 'error');
+                this.stop()
+                return;
+            }
+            if (!this.peerConnection) {
+                this.log('Peer connection failed to create', 'error');
+                this.stop()
+                return;
+            }
+            this.peerConnection?.addTrack(track, this.localStream);
+        });
+
+        this.peerConnection.oniceconnectionstatechange = () => {
+            this.log(`ICE connection state changed to: ${this.peerConnection?.iceConnectionState}`, 'debug');
+            if (this.peerConnection?.iceConnectionState === 'connected') {
+                this.connected = true;
+                this.log('Peer connection connected', 'debug');
+            } else if (this.peerConnection?.iceConnectionState === 'disconnected') {
+                this.log('Peer connection disconnected', 'debug');
+                if (!this.finished && this.eventHandlers.onCriticalError) {
+                    this.eventHandlers.onCriticalError('Connection to server lost');
+                } else if (!this.finished && this.eventHandlers.onError) {
+                    this.eventHandlers.onError('Connection to server lost');
+                }
+                this.stop();
+            } else if (this.peerConnection?.iceConnectionState === 'failed') {
+               if (this.eventHandlers.onCriticalError) {
+                this.eventHandlers.onCriticalError('Connection to server failed');
+               } else if (this.eventHandlers.onError) {
+                this.eventHandlers.onError('Connection to server failed');
+               }
+               this.log('Connection to server failed, stopping conversation', 'error');
+               this.stop();
+            }
+        };
+
+        this.peerConnection.ontrack = (event) => {
+            if (!this.audioElement) {
+                this.log('Audio element not found', 'error');
+                return;
+            }
+            const stream = event.streams[0];
+            this.audioElement.srcObject = stream;
+            this.audioElement.play().catch((e) => this.log(`Audio element play error: ${e}`, 'error'));
+        };
+
+        // Now that peer connection is ready, create and send offer
+        await this.createAndSendOffer();
+    }
+
+    private async createAndSendOffer() {
+        if (!this.peerConnection || !this.wsConnection) {
+            this.log('Peer connection or WebSocket not ready', 'error');
+            return;
+        }
+
+        const offer = await this.peerConnection.createOffer();
+
+        this.peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+              this.log(`RTC: Sending candidate to server`, 'debug');
+              this.wsConnection?.send(
+                JSON.stringify({
+                  type: "ice-candidate",
+                  payload: event.candidate,
+                }),
+              );
+            }
+        };
+
+        await this.peerConnection.setLocalDescription(offer);
+        this.log(`RTC: Sending offer to server`, 'debug');
+        this.wsConnection?.send(JSON.stringify({
+            type: "offer",
+            payload: this.peerConnection?.localDescription,
+        }));
+        this.log(`RTC: Sending form to server`, 'debug');
+        this.wsConnection?.send(JSON.stringify({
+            type: "form",
+            payload: this.form,
+        }));
+    }
+
     /**
      * Stop the conversation, this will cut off audio mid output
      */
